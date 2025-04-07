@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="google_search.css">
+  </head>
+  <center>
+    <header>
+        <ul>
+         <li><a class="links" href="#user"><button class="signbutton" type="button">Sign in</button></a></li>
+           <li><a href="#grid"><img class="grid" src="https://cdn3.iconfinder.com/data/icons/navigation-and-settings/24/Material_icons-01-11-512.png" title="Google apps"></a></li>
+          <li><a href="#images">Images</a></li>
+          <li><a href="#gmail">Gmail</a></li>
+        </ul>  
+    </header>
+    <div class="logo">
+      <img alt="Google" src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png">
+    </div>
+    <div class="bar">
+      <div class="autocomplete-suggestion-inner">
+        <div class="magnify-icon"></div>
+        <input id="searchbar" class="searchbar" type="text" title="Search">
+        <a href="#"> <img class="voice" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Google_mic.svg/716px-Google_mic.svg.png" title="Search by Voice"></a>
+      </div>
+
+      <div class="bar-extras-container">
+        <div style="border-top: 1px solid #e8eaed; margin: 0 20px 0 14px; padding-bottom: 4px;"></div>
+
+        <div class="autocomplete-container">
+            <ul id="autocomplete-list">
+                <li class="autocomplete-suggestion-outer">
+                    <div class="autocomplete-suggestion-inner">
+                        <div class="magnify-icon"></div>
+                        <div class="suggestion-text-container-1">
+                            <div>
+                                <div class="suggestion-text-container-3">
+                                    <span class="suggestion-text-span">
+                                        how to
+                                        <b>watch the ball drop</b>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="bar-buttons">
+            <button class="button" type="button">Google Search</button>
+            <button class="button" type="button">I'm Feeling Lucky</button>
+        </div>
+      </div>
+    </div>
+    <div class="buttons">
+      <button class="button" type="button">Google Search</button>
+      <button class="button" type="button">I'm Feeling Lucky</button>
+     </div>
+
+     <script src="/socket.io/socket.io.js"></script>
+     <script>
+        function generateSuggestionElement(start, autocomplete) {
+            const b = document.createElement("b");
+            b.innerText = autocomplete;
+
+            const span = document.createElement("span");
+            span.classList.add("suggestion-text-span");
+            span.innerHTML = start;
+            span.appendChild(b);
+
+            const third = document.createElement("div");
+            third.classList.add("suggestion-text-container-3");
+            third.appendChild(span);
+
+            const second = document.createElement("div");
+            second.appendChild(third);
+
+            const first = document.createElement("div");
+            first.classList.add("suggestion-text-container-1");
+            first.appendChild(second);
+
+            const magnifyIcon = document.createElement("div");
+            magnifyIcon.classList.add("magnify-icon");
+
+            const inner = document.createElement("div");
+            inner.classList.add("autocomplete-suggestion-inner");
+            inner.appendChild(magnifyIcon);
+            inner.appendChild(first);
+
+            const outer = document.createElement("li");
+            outer.classList.add("autocomplete-suggestion-outer");
+            outer.appendChild(inner);
+
+            return outer;
+        }
+
+        const socket = io();
+
+        const searchbar = document.getElementById("searchbar");
+
+        searchbar.addEventListener("keydown", function(event) {
+            if (event.key !== "Enter") {
+                return;
+            }
+
+            const text = event.target.value;
+
+            if (text) {
+                socket.emit("chatMessage", text);
+                event.target.value = "";
+            }
+        });
+
+        const autocompleteList = document.getElementById("autocomplete-list");
+
+        socket.on("chatMessage", function(msg) {
+            const a = generateSuggestionElement(msg, "");
+            autocompleteList.insertBefore(a, autocompleteList.firstChild);
+        });
+     </script>
+  </body>
+</html>
